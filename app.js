@@ -13,6 +13,7 @@ mongoose
   .catch(console.error);
 
 app.use("/", mainRouter);
+app.use("/", mainRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
