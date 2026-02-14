@@ -1,34 +1,41 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const { NOT_FOUND_ERROR_CODE } = require("./utils/errors");
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
+const { NOT_FOUND_ERROR_CODE } = require("./utils/errors");
+
+// --- Connect to MongoDB ---
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    console.log("Connected to DB");
-  })
-  .catch((e) => {
-    console.log("DB error", e);
-  });
+  .then(() => console.log("Connected to DB"))
+  .catch((err) => console.error("DB connection error:", err));
 
-const routes = require("./routes");
+// --- Global Middleware ---
 app.use(express.json());
-app.use(routes);
 
+// Temporary authorization middleware (must be BEFORE routes)
 app.use((req, res, next) => {
   req.user = {
-    _id: "6983e768f53ad18c6d118846", // paste the _id of the test user created in the previous step
+    _id: "65a3e768f53ad18c6d118846", // valid 24-char ObjectId
   };
   next();
 });
 
-// 404 handler — must be BEFORE app.listen()
+// --- Routes ---
+const routes = require("./routes");
+app.use(routes);
+
+// --- 404 Handler ---
 app.use((req, res) => {
-  res.status(404).send({ message: "Requested resource not found" });
+  res.status(NOT_FOUND_ERROR_CODE).send({
+    message: "Requested resource not found",
+  });
 });
 
+// --- Start Server ---
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log("This is working");
 });

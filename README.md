@@ -1,13 +1,64 @@
-# WTWR (What to Wear?): Back End
+⭐ WTWR (What to Wear?) — Backend API
+The WTWR backend provides the server‑side logic for the What to Wear? application. It handles data storage, user authorization, and item management, giving the frontend a secure and reliable API to interact with. This project is built with Node.js, Express, and MongoDB, and follows best practices for validation, error handling, and RESTful design.
 
-The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and user authorization.
+🚀 Features
+The backend includes:
 
-## Running the Project
+- User registration and authentication (JWT‑based)
+- Secure password hashing
+- CRUD operations for clothing items
+- Ownership enforcement (only owners can delete their items)
+- Like/unlike functionality for items
+- Centralized error handling
+- Request validation
+- MongoDB data modeling with Mongoose
 
-`npm run start` — to launch the server
+📡 API Endpoints
+Items
+| | | |
+| | /items | |
+| | /items | |
+| | /items/:itemId | |
+| | /items/:itemId/likes | |
+| | /items/:itemId/likes | |
 
-`npm run dev` — to launch the server with the hot reload feature
+Users
+| | | |
+| | /signup | |
+| | /signin | |
+| | /users/me | |
 
-### Testing
+🧱 Project Structure
+/controllers # Route handlers
+/models # Mongoose schemas
+/routes # Express routes
+/middlewares # Auth, error handling, validation
+/utils # Constants and helpers
+app.js # App entry point
 
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+🛠 Running the Project
+Start the server
+npm run start
+
+Start with hot reload (Nodemon)
+npm run dev
+
+🧪 Testing Requirement
+Before committing your code, update the file:
+sprint.txt
+
+This file must contain only the sprint number you are currently working on.
+Example:
+12
+
+This is required for automated project testing.
+
+🗄 Technologies Used
+
+- Node.js
+- Express
+- MongoDB + Mongoose
+- JWT Authentication
+- Celebrate/Joi Validation
+- Bcrypt
+- ESLint

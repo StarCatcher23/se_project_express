@@ -61,7 +61,7 @@ const getUser = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
