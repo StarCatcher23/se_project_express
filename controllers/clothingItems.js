@@ -2,14 +2,13 @@ const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE, // ← Add this line!
+  NOT_FOUND_ERROR_CODE,
 } = require("../utils/errors");
 
 // CREATE ITEM
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const owner = req.user ? req.user._id : null;
-  console.log("Creating item with data:", { name, weather, imageUrl, owner });
+  const owner = req.user._id;
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
@@ -40,47 +39,6 @@ const getItems = (req, res) => {
       console.error(err);
       res.status(INTERNAL_SERVER_ERROR_CODE).send({
         message: "Internal server error",
-      });
-    });
-};
-
-// UPDATE ITEM
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  ClothingItem.findByIdAndUpdate(
-    itemId,
-    { $set: { imageUrl } },
-    { new: true, runValidators: true }
-  )
-    .orFail()
-    .then((item) => {
-      return res.status(200).send({ data: item });
-    })
-    .catch((e) => {
-      console.error(e);
-
-      if (e.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: "Invalid item ID format",
-        });
-      }
-
-      if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({
-          message: "Item not found",
-        });
-      }
-
-      if (e.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: "Invalid data",
-        });
-      }
-
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({
-        message: "Error from updateItem",
       });
     });
 };
@@ -189,7 +147,6 @@ const unlikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   unlikeItem,
