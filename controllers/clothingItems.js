@@ -2,12 +2,14 @@ const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
+  NOT_FOUND_ERROR_CODE, // ← Add this line!
 } = require("../utils/errors");
 
 // CREATE ITEM
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user ? req.user._id : null;
+  console.log("Creating item with data:", { name, weather, imageUrl, owner });
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {

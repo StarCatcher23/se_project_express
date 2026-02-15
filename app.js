@@ -5,8 +5,6 @@ const { NOT_FOUND_ERROR_CODE } = require("./utils/errors");
 const { PORT = 3001 } = process.env;
 const app = express();
 
-const { NOT_FOUND_ERROR_CODE } = require("./utils/errors");
-
 // --- Connect to MongoDB ---
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
@@ -25,14 +23,10 @@ app.use((req, res, next) => {
 });
 
 // --- Routes ---
-const routes = require("./routes");
+const routes = require("./routes/index");
 app.use(routes);
-
-// --- 404 Handler ---
-app.use((req, res) => {
-  res.status(NOT_FOUND_ERROR_CODE).send({
-    message: "Requested resource not found",
-  });
+app.get("/hello", (req, res) => {
+  res.send("Hello, World!");
 });
 
 // --- Start Server ---
