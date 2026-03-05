@@ -44,35 +44,45 @@ const getItems = (req, res) => {
 };
 
 // DELETE ITEM
+// DELETE ITEM
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
+  ClothingItem.findById(itemId)
     .then((item) => {
-      return res.status(200).send({
-        message: "Item deleted successfully",
-        data: item,
+      if (!item) {
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "Item not found" });
+      }
+
+      // ⭐ Ownership check
+      if (item.owner.toString() !== req.user._id) {
+        return res
+          .status(403)
+          .send({ message: "You cannot delete another user's item" });
+      }
+
+      // ⭐ User is owner → delete
+      return ClothingItem.findByIdAndDelete(itemId).then(() => {
+        res.status(200).send({
+          message: "Item deleted successfully",
+          data: item,
+        });
       });
     })
-    .catch((e) => {
-      console.error(e);
+    .catch((err) => {
+      console.error(err);
 
-      if (e.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: "Invalid item ID format",
-        });
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid item ID format" });
       }
 
-      if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({
-          message: "Item not found",
-        });
-      }
-
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({
-        message: "Error from deleteItem",
-      });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Error from deleteItem" });
     });
 };
 
