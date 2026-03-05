@@ -62,3 +62,8 @@ This is required for automated project testing.
 - Celebrate/Joi Validation
 - Bcrypt
 - ESLint
+
+## Project Pitch Video
+
+Check out [this video] [text](https://drive.google.com/file/d/1jmSye8uaYUYnXSRv5ALCLG-NW0nmunt_/view?usp=sharing), where I describe my
+project and some challenges I faced while building it.
