@@ -7,6 +7,7 @@ const {
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
+  CONFLICT,
 } = require("../utils/errors");
 
 // GET /users/me
@@ -39,36 +40,50 @@ const getCurrentUser = (req, res, next) => {
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    name,
-    avatar,
-    email,
-    password: hashedPassword,
-  })
-    .then((user) => {
-      const userObj = user.toObject();
-      delete userObj.password;
-
-      return res.status(201).send(userObj);
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err.code === 11000) {
-        return res.status(409).send({ message: "Email already exists" });
-      }
-
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data" });
-      }
-
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Server error" });
+  // 1. Early validation for required fields
+  if (!email || !password) {
+    return res.status(BAD_REQUEST_ERROR_CODE).send({
+      message: "Email and password are required",
     });
+  }
+
+  try {
+    // 2. Safe to hash now
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Create user with Mongoose validation
+    const user = await User.create({
+      name,
+      avatar,
+      email,
+      password: hashedPassword,
+    });
+
+    // 4. Remove password before sending response
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    return res.status(201).send(userObj);
+  } catch (err) {
+    console.log(err);
+
+    // Duplicate email
+    if (err.code === 11000) {
+      return res.status(CONFLICT).send({ message: "Email already exists" });
+    }
+
+    // Mongoose validation errors
+    if (err.name === "ValidationError") {
+      return res.status(BAD_REQUEST_ERROR_CODE).send({
+        message: "Invalid data",
+      });
+    }
+
+    // 5. Unexpected errors → JSON 500
+    return res.status(INTERNAL_SERVER_ERROR_CODE).send({
+      message: "An error has occurred on the server",
+    });
+  }
 };
 
 // POST /signin
@@ -92,7 +107,9 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(401).send({ message: "Incorrect email or password" });
+      return res
+        .status(UNAUTHORIZED_ERROR_CODE)
+        .send({ message: "Incorrect email or password" });
     });
 };
 

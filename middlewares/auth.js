@@ -7,7 +7,9 @@ module.exports = (req, res, next) => {
 
   //if thee's no authorization header or it doesn't start with "Bearer ", return 401 Unauthorized
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    return res.status(401).send({ message: "Authorization required" });
+    return res
+      .status(UNAUTHORIZED_ERROR_CODE)
+      .send({ message: "Authorization required" });
   }
 
   const token = authorization.replace("Bearer ", ""); //extracting the actual token from the header by removing the "Bearer " prefix
@@ -17,7 +19,9 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return res.status(401).send({ message: "Invalid token" });
+    return res
+      .status(UNAUTHORIZED_ERROR_CODE)
+      .send({ message: "Invalid token" });
   }
 
   req.user = payload; // now req.user._id is available, this attaches the user information to the request object for use in subsequent middleware and route handlers

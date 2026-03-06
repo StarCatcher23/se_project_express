@@ -1,10 +1,12 @@
 const ClothingItem = require("../models/clothingItem"); // Importing the ClothingItem model to interact with the clothing items collection in the database
 
-const {// Importing error codes from a utility file to standardize error responses
+const {
+  // Importing error codes from a utility file to standardize error responses
   BAD_REQUEST_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
-} = require("../utils/errors");// Importing error codes from a utility file to standardize error responses
+  FORBIDDEN_ERROR_CODE,
+} = require("../utils/errors"); // Importing error codes from a utility file to standardize error responses
 
 // CREATE ITEM
 const createItem = (req, res) => {
@@ -13,30 +15,34 @@ const createItem = (req, res) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      res.status(201).send({ data: item });// Sending a 201 Created response with the newly created item data
+      res.status(201).send({ data: item }); // Sending a 201 Created response with the newly created item data
     })
     .catch((err) => {
-      console.error(err);//
+      console.error(err); //
 
-      if (err.name === "ValidationError") {// If the error is a validation error, send a 400 Bad Request response with an appropriate message
+      if (err.name === "ValidationError") {
+        // If the error is a validation error, send a 400 Bad Request response with an appropriate message
         return res.status(BAD_REQUEST_ERROR_CODE).send({
           message: "Invalid data",
         });
       }
 
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({// For any other errors, send a 500 Internal Server Error response with a generic message
+      return res.status(INTERNAL_SERVER_ERROR_CODE).send({
+        // For any other errors, send a 500 Internal Server Error response with a generic message
         message: "An error has occurred on the server",
       });
     });
 };
 
 // GET ALL ITEMS
-const getItems = (req, res) => { // Fetching all clothing items from the database and sending them in the response
+const getItems = (req, res) => {
+  // Fetching all clothing items from the database and sending them in the response
   ClothingItem.find({})
     .then((items) => {
-      res.status(200).send({ data: items });// Sending a 200 OK response with the array of clothing items
+      res.status(200).send({ data: items }); // Sending a 200 OK response with the array of clothing items
     })
-    .catch((err) => {// If there's an error while fetching items, log the error and send a 500 Internal Server Error response with a generic message
+    .catch((err) => {
+      // If there's an error while fetching items, log the error and send a 500 Internal Server Error response with a generic message
       console.error(err);
       res.status(INTERNAL_SERVER_ERROR_CODE).send({
         message: "Internal server error",
@@ -44,14 +50,15 @@ const getItems = (req, res) => { // Fetching all clothing items from the databas
     });
 };
 
-
 // DELETE ITEM
-const deleteItem = (req, res) => {// Deleting a clothing item by its ID, with an ownership check to ensure only the owner can delete their item
+const deleteItem = (req, res) => {
+  // Deleting a clothing item by its ID, with an ownership check to ensure only the owner can delete their item
   const { itemId } = req.params;
 
   ClothingItem.findById(itemId)
     .then((item) => {
-      if (!item) {// If the item is not found, send a 404 Not Found response with an appropriate message
+      if (!item) {
+        // If the item is not found, send a 404 Not Found response with an appropriate message
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "Item not found" });
@@ -60,7 +67,7 @@ const deleteItem = (req, res) => {// Deleting a clothing item by its ID, with an
       // ⭐ Ownership check// If the item exists, check if the requesting user is the owner of the item. If not, send a 403 Forbidden response
       if (item.owner.toString() !== req.user._id) {
         return res
-          .status(403)
+          .status(FORBIDDEN_ERROR_CODE)
           .send({ message: "You cannot delete another user's item" });
       }
 
@@ -75,7 +82,8 @@ const deleteItem = (req, res) => {// Deleting a clothing item by its ID, with an
     .catch((err) => {
       console.error(err);
 
-      if (err.name === "CastError") {// If the error is a CastError (invalid item ID format), send a 400 Bad Request response with an appropriate message
+      if (err.name === "CastError") {
+        // If the error is a CastError (invalid item ID format), send a 400 Bad Request response with an appropriate message
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID format" });
@@ -83,7 +91,7 @@ const deleteItem = (req, res) => {// Deleting a clothing item by its ID, with an
 
       return res // For any other errors, send a 500 Internal Server Error response with a generic message
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from deleteItem" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -91,7 +99,8 @@ const deleteItem = (req, res) => {// Deleting a clothing item by its ID, with an
 const likeItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndUpdate(// Using $addToSet to add the user's ID to the likes array only if it is not already present, preventing duplicate likes
+  ClothingItem.findByIdAndUpdate(
+    // Using $addToSet to add the user's ID to the likes array only if it is not already present, preventing duplicate likes
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
@@ -103,19 +112,22 @@ const likeItem = (req, res) => {
     .catch((e) => {
       console.error(e);
 
-      if (e.name === "CastError") { // If the error is a CastError (invalid item ID format), send a 400 Bad Request response with an appropriate message
+      if (e.name === "CastError") {
+        // If the error is a CastError (invalid item ID format), send a 400 Bad Request response with an appropriate message
         return res.status(BAD_REQUEST_ERROR_CODE).send({
           message: "Invalid item ID format",
         });
       }
 
-      if (e.name === "DocumentNotFoundError") { // If the error is a DocumentNotFoundError (item not found), send a 404 Not Found response with an appropriate message
+      if (e.name === "DocumentNotFoundError") {
+        // If the error is a DocumentNotFoundError (item not found), send a 404 Not Found response with an appropriate message
         return res.status(NOT_FOUND_ERROR_CODE).send({
           message: "Item not found",
         });
       }
 
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({ // For any other errors, send a 500 Internal Server Error response with a generic message
+      return res.status(INTERNAL_SERVER_ERROR_CODE).send({
+        // For any other errors, send a 500 Internal Server Error response with a generic message
         message: "Error from likeItem",
       });
     });
@@ -125,7 +137,8 @@ const likeItem = (req, res) => {
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndUpdate(// Using $pull to remove the user's ID from the likes array if it exists, allowing users to unlike items they have previously liked
+  ClothingItem.findByIdAndUpdate(
+    // Using $pull to remove the user's ID from the likes array if it exists, allowing users to unlike items they have previously liked
     itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
