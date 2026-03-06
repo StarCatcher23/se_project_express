@@ -8,6 +8,7 @@ const {
   NOT_FOUND_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
   CONFLICT,
+  UNAUTHORIZED_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET /users/me
