@@ -106,9 +106,7 @@ const likeItem = (req, res) => {
     { new: true }
   )
     .orFail() // If the item is not found, orFail() will throw an error that we can catch to send a 404 Not Found response
-    .then((item) => {
-      return res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
       console.error(e);
 
@@ -145,7 +143,7 @@ const unlikeItem = (req, res) => {
   )
     .orFail()
     .then((item) => {
-      return res.status(200).send({ data: item });
+      res.status(200).send({ data: item });
     })
     .catch((e) => {
       console.error(e);

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 
 const {
@@ -12,7 +12,7 @@ const {
 } = require("../utils/errors");
 
 // GET /users/me
-const getCurrentUser = (req, res, next) => {
+const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
@@ -20,7 +20,7 @@ const getCurrentUser = (req, res, next) => {
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "User not found" });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       console.error(err);
@@ -66,7 +66,7 @@ const createUser = async (req, res) => {
 
     return res.status(201).send(userObj);
   } catch (err) {
-    console.log(err);
+    console.warn(err);
 
     // Duplicate email
     if (err.code === 11000) {
@@ -131,10 +131,10 @@ const updateCurrentUser = (req, res) => {
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "User not found" });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      console.error(err);
+      console.warn(err);
 
       if (err.name === "ValidationError") {
         return res
