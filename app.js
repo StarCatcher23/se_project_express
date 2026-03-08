@@ -11,6 +11,7 @@ app.use(cors());
 
 // --- Routes ---
 const routes = require("./routes");
+
 app.use(routes);
 
 // --- Connect to MongoDB ---
