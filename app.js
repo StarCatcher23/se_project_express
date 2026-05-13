@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { errors } = require("celebrate");
+const NotFoundError = require("./errors/not-found-err");
+const errorHandler = require("./middlewares/error-handler");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -13,20 +16,16 @@ app.use(cors());
 const routes = require("./routes");
 app.use(routes);
 
-// --- 404 Handler (must be AFTER routes) ---
-const NotFoundError = require("./errors/not-found-err");
+// --- 404 Handler ---
 app.use((req, res, next) => {
   next(new NotFoundError("Requested resource not found"));
 });
 
-// --- Global Error Handler (must be BEFORE listen) ---
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+// --- Celebrate Error Handler ---
+app.use(errors());
 
-  res.status(statusCode).send({
-    message: statusCode === 500 ? "An error occurred on the server" : message,
-  });
-});
+// --- Centralized Error Handler ---
+app.use(errorHandler);
 
 // --- Connect to MongoDB ---
 mongoose

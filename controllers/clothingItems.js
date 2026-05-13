@@ -4,24 +4,7 @@ const NotFoundError = require("../errors/not-found-err");
 const BadRequestError = require("../errors/bad-request-err");
 const ForbiddenError = require("../errors/forbidden-err");
 
-module.exports.getProfile = (req, res, next) =>
-  User.findOne({ _id: req.params.userId })
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError("No user with matching ID found");
-      }
 
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return next(
-          new BadRequestError("The id string is in an invalid format")
-        );
-      }
-
-      next(err);
-    });
 
 // CREATE ITEM
 const createItem = (req, res, next) => {

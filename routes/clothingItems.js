@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
+const { celebrate, Joi } = require("celebrate");
 
 const {
   getItems,
@@ -10,22 +11,58 @@ const {
 } = require("../controllers/clothingItems");
 
 // ===== PUBLIC ROUTES =====
-// READ - List all items (public endpoint)
 router.get("/", getItems);
 
 // ===== PROTECTED ROUTES =====
-// All routes below require authentication
 
-// CREATE - Add a new item to the collection with the provided details, associating it with the authenticated user as the owner
-router.post("/", auth, createItem);
+// CREATE ITEM
+router.post(
+  "/",
+  auth,
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().required().min(2).max(30),
+      weather: Joi.string().required().valid("hot", "warm", "cold"),
+      imageUrl: Joi.string().required().uri(),
+    }),
+  }),
+  createItem
+);
 
-// DELETE - Remove an item by its ID, ensuring that only the owner of the item can delete it
-router.delete("/:itemId", auth, deleteItem);
+// DELETE ITEM
+router.delete(
+  "/:itemId",
+  auth,
+  celebrate({
+    params: Joi.object().keys({
+      itemId: Joi.string().hex().length(24).required(),
+    }),
+  }),
+  deleteItem
+);
 
-// LIKE - Add a like to an item by its ID, allowing users to like items they find interesting or useful
-router.put("/:itemId/likes", auth, likeItem);
+// LIKE ITEM
+router.put(
+  "/:itemId/likes",
+  auth,
+  celebrate({
+    params: Joi.object().keys({
+      itemId: Joi.string().hex().length(24).required(),
+    }),
+  }),
+  likeItem
+);
 
-// UNLIKE - Remove a like from an item by its ID, allowing users to unlike items they have previously liked
-router.delete("/:itemId/likes", auth, unlikeItem);
+// UNLIKE ITEM
+router.delete(
+  "/:itemId/likes",
+  auth,
+  celebrate({
+    params: Joi.object().keys({
+      itemId: Joi.string().hex().length(24).required(),
+    }),
+  }),
+  unlikeItem
+);
 
 module.exports = router;
