@@ -13,7 +13,13 @@ app.use(cors());
 const routes = require("./routes");
 app.use(routes);
 
-// --- Error Handler (must be BEFORE listen) ---
+// --- 404 Handler (must be AFTER routes) ---
+const NotFoundError = require("./errors/not-found-err");
+app.use((req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
+});
+
+// --- Global Error Handler (must be BEFORE listen) ---
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
 
