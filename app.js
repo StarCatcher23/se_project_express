@@ -11,8 +11,16 @@ app.use(cors());
 
 // --- Routes ---
 const routes = require("./routes");
-
 app.use(routes);
+
+// --- Error Handler (must be BEFORE listen) ---
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res.status(statusCode).send({
+    message: statusCode === 500 ? "An error occurred on the server" : message,
+  });
+});
 
 // --- Connect to MongoDB ---
 mongoose
