@@ -9,7 +9,6 @@ const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
-// const { PORT = 3001 } = process.env;
 const PORT = 3001;
 
 // --- Logger Middleware ---
@@ -18,6 +17,13 @@ app.use(requestLogger);
 // --- Global Middleware ---
 app.use(express.json());
 app.use(cors());
+
+// --- Crash Test Route (ADD THIS HERE) ---
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
 
 // --- Routes ---
 const routes = require("./routes");
