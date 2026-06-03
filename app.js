@@ -9,7 +9,8 @@ const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
-const { PORT = 3001 } = process.env;
+// const { PORT = 3001 } = process.env;
+const PORT = 3001;
 
 // --- Logger Middleware ---
 app.use(requestLogger);
@@ -41,4 +42,6 @@ mongoose
   .then(() => console.warn("Connected to DB"))
   .catch((err) => console.error("DB connection error:", err));
 
-module.exports = app;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
