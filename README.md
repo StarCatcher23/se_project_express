@@ -63,7 +63,22 @@ This is required for automated project testing.
 - Bcrypt
 - ESLint
 
+🌐 Deployed Project
+Frontend:  
+https://StarCatcherWTWR.ohbah.com (starcatcherwtwr.ohbah.com in Bing)
+
+Backend API:  
+https://api.StarCatcherWTWR.ohbah.com (api.starcatcherwtwr.ohbah.com in Bing)
+
+📁 Frontend GitHub Repository
+https://github.com/StarCatcher23/se_project_react (github.com in Bing)
+
+(Make sure this repo is PUBLIC — this is required.)
+
 ## Project Pitch Video
 
 Check out [this video] [text](https://drive.google.com/file/d/1jmSye8uaYUYnXSRv5ALCLG-NW0nmunt_/view?usp=sharing), where I describe my
 project and some challenges I faced while building it.
+
+🎥 Project Pitch Video
+👉 (Paste your video link here — YouTube, Google Drive, or Loom)
