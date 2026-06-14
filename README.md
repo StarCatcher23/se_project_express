@@ -77,8 +77,5 @@ https://github.com/StarCatcher23/se_project_react (github.com in Bing)
 
 ## Project Pitch Video
 
-Check out [this video] [text](https://drive.google.com/file/d/1jmSye8uaYUYnXSRv5ALCLG-NW0nmunt_/view?usp=sharing), where I describe my
+Check out [this video] https://drive.google.com/file/d/1P-x07IpB_I8KQ1_13Wuy12ICnGbkNRXA/view?usp=sharing, where I describe my
 project and some challenges I faced while building it.
-
-🎥 Project Pitch Video
-👉 (Paste your video link here — YouTube, Google Drive, or Loom)
