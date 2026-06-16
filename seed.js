@@ -102,7 +102,7 @@ const defaultClothingItems = [
 
 // Connect to MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db").then(() => {
-  console.log("Connected to MongoDB");
+  process.stdout.write("Connected to MongoDB\n");
 
   // Get a default user ID (use the first user or create one)
   const defaultUserId = "65a3e768f53ad18c6d118846";
@@ -116,15 +116,15 @@ mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db").then(() => {
   // Clear existing items and seed new ones
   ClothingItem.deleteMany({})
     .then(() => {
-      console.log("Cleared existing items");
+      process.stdout.write("Cleared existing items\n");
       return ClothingItem.insertMany(itemsWithOwner);
     })
     .then((items) => {
-      console.log(`Successfully seeded ${items.length} items`);
+      process.stdout.write(`Successfully seeded ${items.length} items\n`);
       mongoose.disconnect();
     })
     .catch((err) => {
-      console.error("Error seeding database:", err);
+      process.stderr.write(`Error seeding database: ${err}\n`);
       mongoose.disconnect();
     });
 });

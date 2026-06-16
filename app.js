@@ -27,6 +27,7 @@ app.get("/crash-test", () => {
 
 // --- Routes ---
 const routes = require("./routes");
+
 app.use(routes);
 
 app.use(errorLogger);
@@ -45,9 +46,13 @@ app.use(errorHandler);
 // --- Connect to MongoDB ---
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => console.warn("Connected to DB"))
-  .catch((err) => console.error("DB connection error:", err));
+  .then(() => {
+    process.stdout.write("Connected to DB\n");
+  })
+  .catch((err) => {
+    process.stderr.write(`DB connection error: ${err}\n`);
+  });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  process.stdout.write(`Server is running on port ${PORT}\n`);
 });

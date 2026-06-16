@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const NotFoundError = require("../errors/not-found-err");
+const BadRequestError = require("../errors/bad-request-err");
 const { JWT_SECRET } = require("../utils/config");
 
 const {
@@ -24,7 +26,7 @@ const getCurrentUser = (req, res, next) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid user ID format"));
       }
-      next(err);
+      return next(err);
     });
 };
 

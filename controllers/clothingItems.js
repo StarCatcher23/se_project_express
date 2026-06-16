@@ -4,8 +4,6 @@ const NotFoundError = require("../errors/not-found-err");
 const BadRequestError = require("../errors/bad-request-err");
 const ForbiddenError = require("../errors/forbidden-err");
 
-
-
 // CREATE ITEM
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
@@ -19,7 +17,7 @@ const createItem = (req, res, next) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid data"));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -57,7 +55,7 @@ const deleteItem = (req, res, next) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid item ID format"));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -76,7 +74,7 @@ const likeItem = (req, res, next) => {
       if (e.name === "CastError") {
         return next(new BadRequestError("Invalid item ID format"));
       }
-      next(e);
+      return next(e);
     });
 };
 
@@ -95,7 +93,7 @@ const unlikeItem = (req, res, next) => {
       if (e.name === "CastError") {
         return next(new BadRequestError("Invalid item ID format"));
       }
-      next(e);
+      return next(e);
     });
 };
 
