@@ -3,15 +3,8 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const NotFoundError = require("../errors/not-found-err");
 const BadRequestError = require("../errors/bad-request-err");
+const UnauthorizedError = require("../errors/unauthorized-err");
 const { JWT_SECRET } = require("../utils/config");
-
-const {
-  BAD_REQUEST_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE,
-  INTERNAL_SERVER_ERROR_CODE,
-  CONFLICT,
-  UNAUTHORIZED_ERROR_CODE,
-} = require("../utils/errors");
 
 // GET /users/me
 const getCurrentUser = (req, res, next) => {
@@ -31,14 +24,12 @@ const getCurrentUser = (req, res, next) => {
 };
 
 // POST /users
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   // 1. Early validation for required fields
   if (!email || !password) {
-    return res.status(BAD_REQUEST_ERROR_CODE).send({
-      message: "Email and password are required",
-    });
+    return next(new BadRequestError("Email and password are required"));
   }
 
   try {
@@ -63,32 +54,26 @@ const createUser = async (req, res) => {
 
     // Duplicate email
     if (err.code === 11000) {
-      return res.status(CONFLICT).send({ message: "Email already exists" });
+      return next(new BadRequestError("A user with this email already exists"));
     }
 
     // Mongoose validation errors
     if (err.name === "ValidationError") {
-      return res.status(BAD_REQUEST_ERROR_CODE).send({
-        message: "Invalid data",
-      });
+      return next(new BadRequestError("Invalid data"));
     }
 
-    // 5. Unexpected errors → JSON 500
-    return res.status(INTERNAL_SERVER_ERROR_CODE).send({
-      message: "An error has occurred on the server",
-    });
+    // 5. Unexpected errors → forward to error middleware
+    return next(err);
   }
 };
 
 // POST /signin
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   // If email or password is missing → 400 Bad Request
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST_ERROR_CODE)
-      .send({ message: "Email and password are required" });
+    return next(new BadRequestError("Email and password are required"));
   }
 
   return User.findUserByCredentials(email, password)
@@ -101,13 +86,11 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res
-        .status(UNAUTHORIZED_ERROR_CODE)
-        .send({ message: "Incorrect email or password" });
+      return next(new UnauthorizedError("Incorrect email or password"));
     });
 };
 
-const updateCurrentUser = (req, res) => {
+const updateCurrentUser = (req, res, next) => {
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -120,9 +103,7 @@ const updateCurrentUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "User not found" });
+        return next(new NotFoundError("User not found"));
       }
       return res.status(200).send(user);
     })
@@ -130,14 +111,10 @@ const updateCurrentUser = (req, res) => {
       console.warn(err);
 
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid data" });
+        return next(new BadRequestError("Invalid data"));
       }
 
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server" });
+      return next(err);
     });
 };
 

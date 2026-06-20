@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
-const { NOT_FOUND_ERROR_CODE } = require("../utils/errors");
+const NotFoundError = require("../errors/not-found-err");
 
 // ===== PUBLIC ROUTES =====
 // Auth routes (no authentication required)
@@ -24,10 +24,8 @@ const userRoutes = require("./users");
 router.use("/users", userRoutes);
 
 // ===== 404 HANDLER =====
-router.use((req, res) => {
-  res
-    .status(NOT_FOUND_ERROR_CODE)
-    .send({ message: "Requested resource not found" });
+router.use((req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
 });
 
 module.exports = router;

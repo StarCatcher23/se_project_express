@@ -18,12 +18,6 @@ app.use(requestLogger);
 app.use(express.json());
 app.use(cors());
 
-// --- Set User ID Middleware ---
-app.use((req, res, next) => {
-  req.user = { _id: "5d8b8592978f8bd833ca8133" };
-  next();
-});
-
 // --- Crash Test Route (ADD THIS HERE) ---
 app.get("/crash-test", () => {
   setTimeout(() => {
